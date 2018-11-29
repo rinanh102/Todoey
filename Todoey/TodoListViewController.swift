@@ -10,7 +10,7 @@ import UIKit
 
 class TodoListViewController: UITableViewController{
 
-    let itemArray = ["Egg", "Milk", "Meat"]
+    var itemArray = ["Egg", "Milk", "Meat"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +42,30 @@ class TodoListViewController: UITableViewController{
         }else{
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }
+    }
+    
+    //MARK: Add new items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField() // create a LOCAL variable within IBAction
+        
+        let alert:UIAlertController = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: UIAlertController.Style.alert)
+        
+        let action:UIAlertAction = UIAlertAction(title: "Add Item", style: UIAlertAction.Style.default) { (action) in
+            //What happen when user click on Add Item button
+//            print(textField.text!)    // print text of LOCAL
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData() // reload the TableView
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create New Item"
+            textField = alertTextField  //assign the LOCAL to a variable in closure
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
     }
     
 
