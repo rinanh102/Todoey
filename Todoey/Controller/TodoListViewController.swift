@@ -11,28 +11,15 @@ import UIKit
 class TodoListViewController: UITableViewController{
 
     var itemArray = [Item]() // an array of item Objects
+   
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist") // the first item of array
     let defaults = UserDefaults()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // NOTICE: look back Quiz App for MVC pattern
-       let newItem1 = Item() //Use Item class, so newItem is a new object of Item class
-        newItem1.title = "Milk"
-        itemArray.append(newItem1)
+    
+        print(dataFilePath)
         
-        let newItem2 = Item()
-        newItem2.title = "Egg"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Meat"
-        itemArray.append(newItem3)
-        
-        //MARK: UserDefaults()
-        // the data persisted everytime launch the App again using UserDefaults method
-        if let item = defaults.array(forKey: "TodoListArray") as? [Item]{
-            itemArray = item
-        }
+        self.loadItems()
     }
     //MARK: Table View DataSoure Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -45,33 +32,17 @@ class TodoListViewController: UITableViewController{
         //Ternary operator -->
         // value = condition ? trueValue : falseValue
         cell.accessoryType = itemArray[indexPath.row].done ? .checkmark : .none
-        
-    // Checkmark eveytime select the cell
-//        if itemArray[indexPath.row].done == true {
-//            cell.accessoryType = .checkmark
-//        }else{
-//            cell.accessoryType = .none
-//        }
         return cell
     }
     
     //MARK: TableView Delegate Method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        print(itemArray[indexPath.row])
         
         tableView.deselectRow(at: indexPath, animated: true) // make a flash effect when ppl tap on the cell
         
         //Replace the code below: If it is true, change to false and reverse
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done // the clever way: reversing what it used to be
-        
- //-->     true or false for checkmark
-//        if itemArray[indexPath.row].done == false {
-//            itemArray[indexPath.row].done = true
-//        }else{
-//            itemArray[indexPath.row].done = false
-//        }
-        //reload the TableView
-        tableView.reloadData()
+        self.saveItems()
     }
     
     //MARK: Add new items
@@ -88,11 +59,7 @@ class TodoListViewController: UITableViewController{
             newItem.title = textField.text!
             
             self.itemArray.append(newItem)
-            
-            //set UserDefaults for data
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            
-            self.tableView.reloadData() // reload the TableView
+            self.saveItems()
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create New Item"
@@ -103,7 +70,29 @@ class TodoListViewController: UITableViewController{
         
         present(alert, animated: true, completion: nil)
     }
+    //MARK: Model Manupulation Method
     
+    func saveItems(){
+        let encoder = PropertyListEncoder()
+        do{
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        }catch{
+            print("ERROR encoding: \(error)")
+        }
+        tableView.reloadData() // reload the TableView
+    }
 
+    func loadItems(){
+        if let data = try? Data(contentsOf: dataFilePath!){
+            let decoder = PropertyListDecoder()
+            do{
+                itemArray = try decoder.decode([Item].self, from: data)
+            }catch{
+                print("ERROR decoding: \(error)")
+            }
+            
+        }
+    }
 }
 
