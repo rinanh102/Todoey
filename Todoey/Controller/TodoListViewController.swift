@@ -7,19 +7,22 @@
 //
 
 import UIKit
+import CoreData
 
-class TodoListViewController: UITableViewController{
+class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]() // an array of item Objects
-   
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist") // the first item of array
+    // access to AppDelegate as an object, then tap into .persistentContainer.viewContext
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     let defaults = UserDefaults()
     override func viewDidLoad() {
         super.viewDidLoad()
-    
-        print(dataFilePath)
         
-        self.loadItems()
+//    print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) // print the path of data
+        // call the func without any parameters
+        loadItems()
+
     }
     //MARK: Table View DataSoure Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -40,6 +43,11 @@ class TodoListViewController: UITableViewController{
         
         tableView.deselectRow(at: indexPath, animated: true) // make a flash effect when ppl tap on the cell
         
+        //remove the data from permanent storage
+//        context.delete(itemArray[indexPath.row])
+//        //remove the data from array
+//        itemArray.remove(at: indexPath.row)
+        
         //Replace the code below: If it is true, change to false and reverse
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done // the clever way: reversing what it used to be
         self.saveItems()
@@ -54,18 +62,19 @@ class TodoListViewController: UITableViewController{
         let alert:UIAlertController = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: UIAlertController.Style.alert)
         
         let action:UIAlertAction = UIAlertAction(title: "Add Item", style: UIAlertAction.Style.default) { (action) in
-            //What happen when user click on Add Item button
-            let newItem = Item()
-            newItem.title = textField.text!
+            //What happen when user click on "Add Item" button
             
+            //create a new object of type item
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             self.saveItems()
-        }
+        } //--------
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create New Item"
             textField = alertTextField  //assign the LOCAL to a variable in closure
         }
-        
         alert.addAction(action)
         
         present(alert, animated: true, completion: nil)
@@ -73,26 +82,51 @@ class TodoListViewController: UITableViewController{
     //MARK: Model Manupulation Method
     
     func saveItems(){
-        let encoder = PropertyListEncoder()
         do{
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         }catch{
-            print("ERROR encoding: \(error)")
+            print("ERROR saving context: \(error)")
         }
         tableView.reloadData() // reload the TableView
     }
+//Provide the default value In case when we retrive the func bbut dont pass anything (Item.fetchRequest())
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do{
+            itemArray = try context.fetch(request)
+        }catch{
+            print("Error fetching data from context: \(error) ")
+        }
+    }
+}
 
-    func loadItems(){
-        if let data = try? Data(contentsOf: dataFilePath!){
-            let decoder = PropertyListDecoder()
-            do{
-                itemArray = try decoder.decode([Item].self, from: data)
-            }catch{
-                print("ERROR decoding: \(error)")
+//MARK: - Search bar Method
+extension TodoListViewController: UISearchBarDelegate{
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print(searchBar.text!)
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+       //Query the object from CoreData
+        request.predicate  = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        // Run the request and Fetch the result  ;assign the result to itemArray
+        loadItems(with: request)
+        saveItems() // why?
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            saveItems()// why?
+            
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
             }
             
         }
     }
 }
+
 
