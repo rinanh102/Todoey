@@ -12,17 +12,25 @@ import CoreData
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]() // an array of item Objects
+    // ditSet is gonna happen as soon as "selectedCategory has the value"
+    var selectedCategory : Category?{
+        didSet{
+            // when we ccall loadItems(), we already have some value for "selectedCategory"
+             // call the func without any parameters
+            loadItems()
+        }
+    }
+    
+    
     // access to AppDelegate as an object, then tap into .persistentContainer.viewContext
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     let defaults = UserDefaults()
     override func viewDidLoad() {
         super.viewDidLoad()
+       
         
 //    print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) // print the path of data
-        // call the func without any parameters
-        loadItems()
-
     }
     //MARK: Table View DataSoure Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -68,6 +76,7 @@ class TodoListViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             self.saveItems()
         } //--------
@@ -85,17 +94,35 @@ class TodoListViewController: UITableViewController {
         do{
             try context.save()
         }catch{
-            print("ERROR saving context: \(error)")
+            print("ERROR saving Items context: \(error)")
         }
         tableView.reloadData() // reload the TableView
     }
 //Provide the default value In case when we retrive the func bbut dont pass anything (Item.fetchRequest())
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+    // set 'nil' is the default value for predicate --> use ? to wrap value
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
+        
+        //Query the object from CoreData
+        //all items in category must have the name of parentCategory match with "selectedCaegory.name"
+        // %@ means value passed in
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+
+        
+        // make sure it never unwrap the nil value
+        if let addtionalPredicate = predicate{
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
+        }else{
+            request.predicate = categoryPredicate
+        }
+        
+//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates:[categoryPredicate, predicate])
+//        request.predicate = compoundPredicate
+        
 //        let request : NSFetchRequest<Item> = Item.fetchRequest()
         do{
             itemArray = try context.fetch(request)
         }catch{
-            print("Error fetching data from context: \(error) ")
+            print("Error fetching Items data from context: \(error) ")
         }
     }
 }
@@ -107,12 +134,13 @@ extension TodoListViewController: UISearchBarDelegate{
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
        //Query the object from CoreData
-        request.predicate  = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        // %@ means value passed in --> searchBar.text!
+        let predicate  = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
 
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
         // Run the request and Fetch the result  ;assign the result to itemArray
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
         saveItems() // why?
     }
     
