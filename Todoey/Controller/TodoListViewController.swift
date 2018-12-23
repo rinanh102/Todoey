@@ -25,7 +25,7 @@ class TodoListViewController: UITableViewController {
     // access to AppDelegate as an object, then tap into .persistentContainer.viewContext
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    let defaults = UserDefaults()
+//    let defaults = UserDefaults()
     override func viewDidLoad() {
         super.viewDidLoad()
        
@@ -100,7 +100,7 @@ class TodoListViewController: UITableViewController {
     }
 //Provide the default value In case when we retrive the func bbut dont pass anything (Item.fetchRequest())
     // set 'nil' is the default value for predicate --> use ? to wrap value
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), from predicate : NSPredicate? = nil){
         
         //Query the object from CoreData
         //all items in category must have the name of parentCategory match with "selectedCaegory.name"
@@ -140,7 +140,7 @@ extension TodoListViewController: UISearchBarDelegate{
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
         // Run the request and Fetch the result  ;assign the result to itemArray
-        loadItems(with: request, predicate: predicate)
+        loadItems(with: request, from: predicate)
         saveItems() // why?
     }
     
