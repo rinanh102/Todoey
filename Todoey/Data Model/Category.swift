@@ -14,5 +14,6 @@ class Category : Object {
     // Create an empty List (likes Array)
     // indise each Category, this thing called item, it will point to list of item object
     // we have foward relationship, each Category has a list of items
-    let items = List<Item>()
+    // "List" represent to-many relationship
+     let items = List<Item>()
 }

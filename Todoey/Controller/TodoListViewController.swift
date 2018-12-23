@@ -52,14 +52,16 @@ class TodoListViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true) // make a flash effect when ppl tap on the cell
         
-        //remove the data from permanent storage
-//        context.delete(todoItems[indexPath.row])
-//        //remove the data from array
-//        todoItems.remove(at: indexPath.row)
-        
-        //Replace the code below: If it is true, change to false and reverse
-//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done // the clever way: reversing what it used to be
-//        self.saveItems()
+        if let item = todoItems?[indexPath.row]{
+            do{
+                try realm.write {
+                    item.done = !item.done
+                }
+            }catch{
+                print("ERROR done status: \(error)")
+            }
+           tableView.reloadData()
+        }
     }
     
     //MARK: Add new items
