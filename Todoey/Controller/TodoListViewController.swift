@@ -17,7 +17,7 @@ class TodoListViewController: UITableViewController {
         didSet{
             // when we ccall loadItems(), we already have some value for "selectedCategory"
              // call the func without any parameters
-            loadItems()
+//            loadItems()
         }
     }
     
@@ -58,7 +58,7 @@ class TodoListViewController: UITableViewController {
         
         //Replace the code below: If it is true, change to false and reverse
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done // the clever way: reversing what it used to be
-        self.saveItems()
+//        self.saveItems()
     }
     
     //MARK: Add new items
@@ -73,12 +73,12 @@ class TodoListViewController: UITableViewController {
             //What happen when user click on "Add Item" button
             
             //create a new object of type item
-            let newItem = Item(context: self.context)
-            newItem.title = textField.text!
-            newItem.done = false
-            newItem.parentCategory = self.selectedCategory
-            self.itemArray.append(newItem)
-            self.saveItems()
+//            let newItem = Item()
+//            newItem.title = textField.text!
+//            newItem.done = false
+//            newItem.parentCategory = self.selectedCategory
+//            self.itemArray.append(newItem)
+//            self.saveItems()
         } //--------
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create New Item"
@@ -90,71 +90,71 @@ class TodoListViewController: UITableViewController {
     }
     //MARK: Model Manupulation Method
     
-    func saveItems(){
-        do{
-            try context.save()
-        }catch{
-            print("ERROR saving Items context: \(error)")
-        }
-        tableView.reloadData() // reload the TableView
-    }
+//    func saveItems(){
+//        do{
+//            try context.save()
+//        }catch{
+//            print("ERROR saving Items context: \(error)")
+//        }
+//        tableView.reloadData() // reload the TableView
+//    }
 //Provide the default value In case when we retrive the func bbut dont pass anything (Item.fetchRequest())
     // set 'nil' is the default value for predicate --> use ? to wrap value
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), from predicate : NSPredicate? = nil){
-        
-        //Query the object from CoreData
-        //all items in category must have the name of parentCategory match with "selectedCaegory.name"
-        // %@ means value passed in
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-
-        
-        // make sure it never unwrap the nil value
-        if let addtionalPredicate = predicate{
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
-        }else{
-            request.predicate = categoryPredicate
-        }
-        
-//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates:[categoryPredicate, predicate])
-//        request.predicate = compoundPredicate
-        
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        do{
-            itemArray = try context.fetch(request)
-        }catch{
-            print("Error fetching Items data from context: \(error) ")
-        }
-    }
+//    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), from predicate : NSPredicate? = nil){
+//
+//        //Query the object from CoreData
+//        //all items in category must have the name of parentCategory match with "selectedCaegory.name"
+//        // %@ means value passed in
+//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//
+//
+//        // make sure it never unwrap the nil value
+//        if let addtionalPredicate = predicate{
+//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
+//        }else{
+//            request.predicate = categoryPredicate
+//        }
+//
+////        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates:[categoryPredicate, predicate])
+////        request.predicate = compoundPredicate
+//
+////        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//        do{
+//            itemArray = try context.fetch(request)
+//        }catch{
+//            print("Error fetching Items data from context: \(error) ")
+//        }
+//    }
 }
 
 //MARK: - Search bar Method
-extension TodoListViewController: UISearchBarDelegate{
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print(searchBar.text!)
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
-       //Query the object from CoreData
-        // %@ means value passed in --> searchBar.text!
-        let predicate  = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        
-        // Run the request and Fetch the result  ;assign the result to itemArray
-        loadItems(with: request, from: predicate)
-        saveItems() // why?
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            saveItems()// why?
-            
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()
-            }
-            
-        }
-    }
-}
+//extension TodoListViewController: UISearchBarDelegate{
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        print(searchBar.text!)
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//
+//       //Query the object from CoreData
+//        // %@ means value passed in --> searchBar.text!
+//        let predicate  = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//
+//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//        // Run the request and Fetch the result  ;assign the result to itemArray
+//        loadItems(with: request, from: predicate)
+//        saveItems() // why?
+//    }
+//
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text?.count == 0 {
+//            loadItems()
+//            saveItems()// why?
+//
+//            DispatchQueue.main.async {
+//                searchBar.resignFirstResponder()
+//            }
+//
+//        }
+//    }
+//}
 
 

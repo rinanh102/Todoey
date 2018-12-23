@@ -7,9 +7,11 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 class CategoryTableViewController: UITableViewController {
 
+    let realm = try! Realm()
+    
     var categoryArray = [Category]()
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -18,7 +20,7 @@ class CategoryTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadCategories()
+//        loadCategories()
         print("Category: \(categoryArray)")
     }
 
@@ -56,25 +58,27 @@ class CategoryTableViewController: UITableViewController {
     }
     
     //MARK: - TableView Manipulation Methods
-    func saveCategories(){
+    func save(category: Category){
         do{
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         }catch{
             print("Error Saving Category message: \(error)")
         }
         tableView.reloadData()
     }
     
-    func loadCategories(){
-        
-        let request : NSFetchRequest<Category> = Category.fetchRequest()
-        
-        do{
-           categoryArray = try context.fetch(request)
-        }catch{
-            print("Error loading Categories: \(error)")
-        }
-    }
+//    func loadCategories(){
+//        
+//        let request : NSFetchRequest<Category> = Category.fetchRequest()
+//        
+//        do{
+//           categoryArray = try context.fetch(request)
+//        }catch{
+//            print("Error loading Categories: \(error)")
+//        }
+//    }
 
     //MARK: - Add New Items
     @IBAction func btnAddButtonPressed(_ sender: UIBarButtonItem) {
@@ -85,10 +89,10 @@ class CategoryTableViewController: UITableViewController {
         
         let action:UIAlertAction = UIAlertAction(title: "Add", style: .default) { (action) in
             // What happens when click the button "Add"
-            let newCategory = Category(context: self.context)
+            let newCategory = Category()
             newCategory.name = textField.text!
             self.categoryArray.append(newCategory)
-            self.saveCategories()
+            self.save(category: newCategory)
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Add new category"
