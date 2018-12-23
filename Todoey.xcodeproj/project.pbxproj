@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		072A352621CFFC2500BE26BD /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072A352521CFFC2500BE26BD /* Data.swift */; };
 		07631C3A219298B100CA4C16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07631C39219298B100CA4C16 /* AppDelegate.swift */; };
 		07631C3C219298B100CA4C16 /* TodoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07631C3B219298B100CA4C16 /* TodoListViewController.swift */; };
 		07631C3F219298B100CA4C16 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07631C3D219298B100CA4C16 /* Main.storyboard */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		072A352521CFFC2500BE26BD /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		07631C36219298B100CA4C16 /* Todoey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todoey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07631C39219298B100CA4C16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		07631C3B219298B100CA4C16 /* TodoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListViewController.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 		0768ECFC21B2F77A00605567 /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
+				072A352521CFFC2500BE26BD /* Data.swift */,
 				076877E421BC163800DAAFBD /* DataModel.xcdatamodeld */,
 			);
 			path = "Data Model";
@@ -249,6 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07631C3C219298B100CA4C16 /* TodoListViewController.swift in Sources */,
+				072A352621CFFC2500BE26BD /* Data.swift in Sources */,
 				076877E621BC163800DAAFBD /* DataModel.xcdatamodeld in Sources */,
 				07631C3A219298B100CA4C16 /* AppDelegate.swift in Sources */,
 				076877FB21BDE6B900DAAFBD /* CategoryTableViewController.swift in Sources */,
