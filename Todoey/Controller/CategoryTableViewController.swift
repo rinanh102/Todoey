@@ -12,34 +12,29 @@ class CategoryTableViewController: UITableViewController {
 
     let realm = try! Realm()
     
-    var categoryArray = [Category]()
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-   
+    // Results Object auto-update new object
+    var categories : Results<Category>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        loadCategories()
-        print("Category: \(categoryArray)")
+        loadCategories()
     }
 
     //MARK: - Tableview Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoryArray.count
+        return categories?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        cell.textLabel?.text = categoryArray[indexPath.row].name
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Caregory Added Yet"
         cell.accessoryType = .disclosureIndicator
         return cell
     }
      //MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(categoryArray[indexPath.row])
-        
-//        tableView.deselectRow(at: indexPath, animated: true)
+        print(categories?[indexPath.row] ?? "No Caregory")
         
        performSegue(withIdentifier: "GoToItem", sender: self)
             
@@ -52,7 +47,7 @@ class CategoryTableViewController: UITableViewController {
         
         // if indexPath not nil
         if let indexPath = tableView.indexPathForSelectedRow{
-            desinationVC.selectedCategory = categoryArray[indexPath.row]
+            desinationVC.selectedCategory = categories?[indexPath.row]
         }
         
     }
@@ -69,16 +64,11 @@ class CategoryTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-//    func loadCategories(){
-//        
-//        let request : NSFetchRequest<Category> = Category.fetchRequest()
-//        
-//        do{
-//           categoryArray = try context.fetch(request)
-//        }catch{
-//            print("Error loading Categories: \(error)")
-//        }
-//    }
+    func loadCategories(){
+        //
+        categories = realm.objects(Category.self)
+        tableView.reloadData()
+    }
 
     //MARK: - Add New Items
     @IBAction func btnAddButtonPressed(_ sender: UIBarButtonItem) {
@@ -91,7 +81,7 @@ class CategoryTableViewController: UITableViewController {
             // What happens when click the button "Add"
             let newCategory = Category()
             newCategory.name = textField.text!
-            self.categoryArray.append(newCategory)
+          
             self.save(category: newCategory)
         }
         alert.addTextField { (alertTextField) in
