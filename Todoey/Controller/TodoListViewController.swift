@@ -8,8 +8,8 @@
 
 import UIKit
 import RealmSwift
-import SwipeCellKit
-class TodoListViewController: UITableViewController {
+
+class TodoListViewController: SwipeTableViewController {
     let realm = try! Realm()
     
     var todoItems : Results<Item>?
@@ -32,7 +32,9 @@ class TodoListViewController: UITableViewController {
         return todoItems?.count ?? 1
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        
         if let item = todoItems?[indexPath.row]{
             cell.textLabel?.text = item.title
             
@@ -63,6 +65,19 @@ class TodoListViewController: UITableViewController {
         }
     }
     
+    //MARK: - Delete Data from Swipe
+    override func updateData(at indexPath: IndexPath) {
+        //        super.updateData(at: indexPath)
+        if let itemIsSelected = self.todoItems?[indexPath.row]{
+            do{
+                try self.realm.write {
+                    self.realm.delete(itemIsSelected)
+                }
+            }catch{
+                print("ERROR deleting Category: \(error)")
+            }
+        }
+    }
     //MARK: Add new items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -133,19 +148,4 @@ extension TodoListViewController: UISearchBarDelegate{
     }
 }
 
-extension TodoListViewController: SwipeTableViewCellDelegate{
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
-        
-        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
-            // handle action by updating model with deletion
-        }
-        
-        // customize the action appearance
-        deleteAction.image = UIImage(named: "delete")
-        
-        return [deleteAction]
-    }
-    
-    
-}
+
