@@ -8,7 +8,7 @@
 
 import UIKit
 import RealmSwift
-
+import SwipeCellKit
 class TodoListViewController: UITableViewController {
     let realm = try! Realm()
     
@@ -25,7 +25,6 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
  
-//    print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)) // print the path of data
     }
     
     //MARK: Table View DataSoure Methods
@@ -55,8 +54,7 @@ class TodoListViewController: UITableViewController {
         if let item = todoItems?[indexPath.row]{
             do{
                 try realm.write {
-                    realm.delete(item)
-//                    item.done = !item.done
+             item.done = !item.done
                 }
             }catch{
                 print("ERROR done status: \(error)")
@@ -135,4 +133,19 @@ extension TodoListViewController: UISearchBarDelegate{
     }
 }
 
-
+extension TodoListViewController: SwipeTableViewCellDelegate{
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .right else { return nil }
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
+            // handle action by updating model with deletion
+        }
+        
+        // customize the action appearance
+        deleteAction.image = UIImage(named: "delete")
+        
+        return [deleteAction]
+    }
+    
+    
+}
