@@ -9,15 +9,17 @@
 import UIKit
 import RealmSwift
 class CategoryTableViewController: UITableViewController {
-
+    //initialize a new access to Realm Database
     let realm = try! Realm()
     
     // Results Object auto-update new object
+    // changed our categories from an array of category items to this new collection type which is a collection of results that our category objects.
+    //And this is an optional so that we can be safe.
     var categories : Results<Category>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(Realm.Configuration.defaultConfiguration.fileURL)
+//        print(Realm.Configuration.defaultConfiguration.fileURL)
         loadCategories()
     }
 
@@ -65,7 +67,7 @@ class CategoryTableViewController: UITableViewController {
     }
     
     func loadCategories(){
-        //
+        //we set that property categories to look inside our realm and fetch all of the objects that belong to the category data type.
         categories = realm.objects(Category.self)
         tableView.reloadData()
     }
