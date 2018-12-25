@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 
 class CategoryTableViewController: SwipeTableViewController {
@@ -34,10 +35,20 @@ class CategoryTableViewController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        // ---- TWO way to deal with 
+//        if let category = categories?[indexPath.row]{
+//            cell.textLabel?.text = category.name
+//
+//            cell.backgroundColor = UIColor(hexString: category.hexColor )
+//        }
         
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Caregory Added Yet"
         
+        cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].hexColor ?? "89DBFE")
+        
         cell.accessoryType = .disclosureIndicator
+        
+        
         return cell
     }
      //MARK: - TableView Delegate Methods
@@ -61,6 +72,7 @@ class CategoryTableViewController: SwipeTableViewController {
     }
     
     //MARK: - TableView Manipulation Methods
+    // persist data in Realmk;,,,m;;@@n
     func save(category: Category){
         do{
             try realm.write {
@@ -92,7 +104,7 @@ class CategoryTableViewController: SwipeTableViewController {
             }
     }
 
-    //MARK: - Add New Items
+    //MARK: - Add New Category
     @IBAction func btnAddButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -103,6 +115,7 @@ class CategoryTableViewController: SwipeTableViewController {
             // What happens when click the button "Add"
             let newCategory = Category()
             newCategory.name = textField.text!
+            newCategory.hexColor = UIColor.randomFlat.hexValue()
           
             self.save(category: newCategory)
         }
