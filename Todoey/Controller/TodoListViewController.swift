@@ -30,14 +30,30 @@ class TodoListViewController: SwipeTableViewController {
         
     }
     override func viewWillAppear(_ animated: Bool) {
-        if let colourHex = selectedCategory?.hexColor {
-            
-            title = selectedCategory!.name
-            guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist")}
-            
-            navBar.barTintColor = UIColor(hexString: colourHex)
-            searchBar.barTintColor = UIColor(hexString: colourHex)
-        }
+         title = selectedCategory?.name
+        
+        guard let colourHex = selectedCategory?.hexColor else {fatalError()}
+  
+        updateNavBar(withHexCode: colourHex)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+       
+       updateNavBar(withHexCode: "89DBFE")
+    }
+    
+    //MARK: - Nav Bar Setup Method
+    func updateNavBar(withHexCode colourHexCode : String){
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist")}
+        guard let navBarColor = UIColor(hexString: colourHexCode) else {fatalError()}
+        navBar.barTintColor = navBarColor
+        
+        //tinColor is the color of Add button and
+        navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+        
+        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+        
+        searchBar.barTintColor = navBarColor
     }
     
     //MARK: Table View DataSoure Methods
