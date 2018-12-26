@@ -12,11 +12,12 @@ import ChameleonFramework
 class TodoListViewController: SwipeTableViewController {
     let realm = try! Realm()
     
+    @IBOutlet weak var searchBar: UISearchBar!
     var todoItems : Results<Item>?
     // ditSet is gonna happen as soon as "selectedCategory has the value"
     var selectedCategory : Category?{
         didSet{
-            // when we ccall loadItems(), we already have some value for "selectedCategory"
+            //didSet when we call loadItems(), we already have some value for "selectedCategory"
              // call the func without any parameters
             loadItems()
         }
@@ -25,6 +26,18 @@ class TodoListViewController: SwipeTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
  
+       
+        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        if let colourHex = selectedCategory?.hexColor {
+            
+            title = selectedCategory!.name
+            guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist")}
+            
+            navBar.barTintColor = UIColor(hexString: colourHex)
+            searchBar.barTintColor = UIColor(hexString: colourHex)
+        }
     }
     
     //MARK: Table View DataSoure Methods
@@ -40,7 +53,7 @@ class TodoListViewController: SwipeTableViewController {
             cell.textLabel?.text = item.title
             
             if let color = UIColor(hexString: selectedCategory!.hexColor)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)){
-                 print("Version1111: \(CGFloat(indexPath.row) / CGFloat(todoItems!.count))")
+           
                 cell.backgroundColor = color
                 cell.textLabel?.textColor = ContrastColorOf(color, returnFlat:  true)
             }
